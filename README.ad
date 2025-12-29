@@ -1,0 +1,96 @@
+= libRR: Library for Redundancy Reduction
+
+The libRR redundancy-reduction library provides some simple and easily
+replicable functions for the sole purpose of not having to rewrite the
+code all over again when starting a new project.
+
+== Building
+
+The only relevant dependencies (on Linux) are:
+
+* GCC
+* Bash
+* Headers of the C-Library (`glibc` or `musl`)
+
+To build the library, execute:
+
+[source,bash]
+----
+./do.sh
+----
+
+== Quick Reference
+
+=== Allocators
+
+There currently are two allocators of which one is a libc-wrapper. The
+other allocator is a fixed-size arena.
+
+To instantiate a libc-wrapper allocator, use this function:
+
+[source,c]
+----
+rr_allocator_s rr_create_cstd_allocator();
+----
+
+To create an arean allocator, use:
+
+
+[source,c]
+----
+rr_allocator_s * rr_new_static_arena(
+    rr_allocator_s *backing_allocator,
+    size_t capacity
+);
+----
+
+NOTE: The arena allocator can't be resized. If it lacks the memory for
+      an allocation call, `NULL` will be returned.
+
+To allocate memory and free or resize an allocation, the following can
+be used:
+
+[source,c]
+----
+void * rr_alloc(
+    rr_allocator_s *allocator,
+    size_t num_bytes
+);
+
+void rr_free(
+    rr_allocator_s *allocator,
+    void *allocation
+);
+
+void * rr_realloc(
+    rr_allocator_s *allocator,
+    void *allocation,
+    size_t new_num_bytes
+);
+----
+
+When an arena is no longer needed, its memory should be freed:
+
+[source,c]
+----
+bool rr_cleanup_allocator(
+    rr_allocator_s *allocator
+);
+----
+
+=== Filesystem Utility
+
+There only is one function in this category:
+
+[source,c]
+----
+void * rr_load_file(
+    const char *path,
+    size_t *out_length,
+    rr_allocator_s *allocator
+);
+----
+
+If `out_length` is `NULL`, it won't be written  (the function will not
+crash because of a SIGSEGV for that).
+
