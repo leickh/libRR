@@ -1,0 +1,13 @@
+
+# Nachine code in various containers
+*.a
+*.elf
+*.o
+*.so
+
+# Folder with build outputs and interim files
+.build/
+
+# Suffix to mark file/folder as hidden (for self-management, et cetera)
+*.private
+
